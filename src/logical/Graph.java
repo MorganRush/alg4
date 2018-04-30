@@ -15,10 +15,13 @@ public class Graph {
 
     private int[][] flow;
 
+    private boolean[] isSeen;
+
     public Graph(){
         countNode = 6;
         bandwidth = new int[countNode][countNode];
         flow = new int [countNode][countNode];
+        isSeen = new boolean[countNode];
         bandwidth[0][1] = 9;
         bandwidth[0][2] = 8;
         bandwidth[1][3] = 6;
@@ -53,7 +56,6 @@ public class Graph {
         ArrayList<Edge> edgesFromChain = new ArrayList<Edge>();
         int minFlowFromChain = infinity;
         int thisIndex = source;
-        //int indexMinedgesFromChain = -1;
 
         while (thisIndex != target){
             ArrayList<Edge> edgesIncident = new ArrayList<Edge>();
@@ -61,29 +63,34 @@ public class Graph {
             int maxBandwidth = 0;
 
             for (int i = 0; i < countNode; i++){
-                if (bandwidth[thisIndex][i] != 0 && flow[thisIndex][i] < bandwidth[thisIndex][i]){
+                if (bandwidth[thisIndex][i] != 0 && !isSeen[i]){
                     edgesIncident.add(new Edge(i, true));
-                    if (bandwidth[thisIndex][i] - flow[thisIndex][i] > maxBandwidth){
+                    if (bandwidth[thisIndex][i] > maxBandwidth){
                         indexMax = edgesIncident.size() - 1;
-                        maxBandwidth = bandwidth[thisIndex][i] - flow[thisIndex][i];
+                        maxBandwidth = bandwidth[thisIndex][i];
                     }
                 }
-                if (bandwidth[i][thisIndex] != 0 && flow[i][thisIndex] > 0){
-                    edgesIncident.add(new Edge(i, false));
-                    if (bandwidth[i][thisIndex] - flow[thisIndex][i] > maxBandwidth){
-                        indexMax = edgesIncident.size() - 1;
-                        maxBandwidth = bandwidth[thisIndex][i] - flow[thisIndex][i];
-                    }
-                }
+//                if (bandwidth[i][thisIndex] != 0 && flow[i][thisIndex] > 0 && !isSeen[i]){
+//                    edgesIncident.add(new Edge(i, false));
+//                    if (bandwidth[i][thisIndex] > maxBandwidth){
+//                        indexMax = edgesIncident.size() - 1;
+//                        maxBandwidth = bandwidth[thisIndex][i];
+//                    }
+//                }
             }
             if (indexMax == -1){
+                int indexIsSeen = 0;
+                if (!edgesFromChain.isEmpty()){
+                    indexIsSeen = edgesFromChain.get(0).getIndexNode();
+                    edgesFromChain.clear();
+                }
+                isSeen[indexIsSeen] = true;
                 break;
             }
             Edge edgeToChain = edgesIncident.get(indexMax);
             edgesFromChain.add(edgeToChain);
             if (maxBandwidth < minFlowFromChain){
                 minFlowFromChain = maxBandwidth;
-                //indexMinedgesFromChain = edgesFromChain.size() - 1;
             }
             thisIndex = edgeToChain.indexNode;
         }
@@ -94,11 +101,14 @@ public class Graph {
             bandwidth[start][next] -= minFlowFromChain;
             start = next;
         }
-        return !edgesFromChain.isEmpty();
+        return !isSeen[0];
     }
 
     public void findMaxFlow(int source, int target){
         int count = 0;
+        for (int i = 0; i < isSeen.length; i++){
+            isSeen[i] = false;
+        }
         while (findPath(source, target)){
             count++;
         }
