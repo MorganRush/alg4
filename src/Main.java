@@ -4,7 +4,8 @@ public class Main {
 
     public static void main(String[] args) {
         Graph graph = new Graph();
-        int result = graph.findMaxFlow(0, 5);
+        graph.test2();
+        int result = graph.findMaxFlow(0, 3);
         System.out.println(result);
     }
 }
