@@ -59,13 +59,11 @@ public class Graph {
                     }
                 }
                 if (!isIEqualsIndexPrevious && i != source && !isSeen[i]){
-                    if (bandwidth[thisIndex][i] >= flow[i][thisIndex]){
-                        if (bandwidth[thisIndex][i] != 0){
-                            edgesIncident.add(new Edge(i, true));
-                            if (bandwidth[thisIndex][i] > maxBandwidth){
-                                indexMax = edgesIncident.size() - 1;
-                                maxBandwidth = bandwidth[thisIndex][i];
-                            }
+                    if (bandwidth[thisIndex][i] >= flow[i][thisIndex] && bandwidth[thisIndex][i] != 0){
+                        edgesIncident.add(new Edge(i, true));
+                        if (bandwidth[thisIndex][i] > maxBandwidth){
+                            indexMax = edgesIncident.size() - 1;
+                            maxBandwidth = bandwidth[thisIndex][i];
                         }
                     } else if (flow[i][thisIndex] > 0){
                         edgesIncident.add(new Edge(i, false));
